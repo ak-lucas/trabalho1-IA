@@ -6,6 +6,7 @@ class Plot:
 	def __init__(self):
 		pass
 
+	# X contém o conjuntos de pontos do eixo x e Y contém o conjunto de pontos do eixo y
 	def plot_graphic(self, X, Y, xlabel='', ylabel='', color='blue', linewidth=2, title='', grid=False):
 		plt.plot(X, Y, color=color, linewidth=linewidth)
 		plt.xlabel(xlabel)
@@ -15,10 +16,12 @@ class Plot:
 
 		plt.show()
 
-class DataStatistics:
+
+class DatasetStatistics:
 	def __init__(self):
 		pass		
 
+	# recebe um array numpy e retorna os valores máximos, mínimos, médios e o desvio padrão de cada coluna
 	def data_statistics(self, X):
 		Max = X.max(axis=0)
 		Min = X.min(axis=0)
@@ -44,6 +47,7 @@ class DatasetScaling:
 	def __init__(self):
 		pass
 
+	# normalização min-max
 	def min_max(self, X):
 		# print Max.shape, X.shape
 		numerator = np.subtract(X, Min)
@@ -58,6 +62,6 @@ class CrossValidation:
 	def __init__(self):
 		pass
 
-	def k_fold(self, X, Y):
+	def k_fold(self, X, Y, k):
 		# TO DO
 		pass
