@@ -17,12 +17,12 @@ class Plot:
 		plt.show()
 
 
-class DatasetStatistics:
+class Dataset:
 	def __init__(self):
 		pass		
 
 	# recebe um array numpy e retorna os valores máximos, mínimos, médios e o desvio padrão de cada coluna
-	def data_statistics(self, X):
+	def dataset_statistics(self, X):
 		Max = X.max(axis=0)
 		Min = X.min(axis=0)
 		Mean = X.mean(axis=0)
@@ -43,12 +43,8 @@ class DatasetStatistics:
 
 		return ds
 
-class DatasetScaling:
-	def __init__(self):
-		pass
-
 	# normalização min-max
-	def min_max(self, X):
+	def dataset_scaling(self, X):
 		# print Max.shape, X.shape
 		numerator = np.subtract(X, Min)
 		denominator = np.subtract(Max, Min)
@@ -58,10 +54,49 @@ class DatasetScaling:
 
 		return np.divide(numerator,denominator)
 
-class CrossValidation:
+	def generate_polynomial_attributes(self, X):
+		# TO DO
+		pass
+
+class ModelSelection:
 	def __init__(self):
 		pass
 
-	def k_fold(self, X, Y, k):
-		# TO DO
-		pass
+	def k_fold(self, X, k, shuffle=False):
+		indices = np.arange(X.shape[0])
+
+		if shuffle:
+			# embaralha índices
+			np.random.shuffle(indices)
+
+		# divide array de índices em k conjuntos de tamanhos iguais
+		indices_ = np.asarray(np.split(indices, k))
+		
+
+		test = []
+		train = []
+		
+		nbgroups = range(len(indices_))
+		# cria duas listas com os índices dos conjuntos de treino e teste
+		for i in nbgroups:
+			test.append(indices_[i])
+			train.append(indices_[np.delete(nbgroups, i)].flatten())
+
+		#print "train", train[0].shape
+		#print "teste", test[0].shape
+
+		return zip(train, test)
+
+X = np.random.randn(100,4)
+Y = np.random.randn(100)
+
+cv = ModelSelection()
+
+for train,test in cv.k_fold(X, k=5, shuffle=False):
+	print train, "\n\n", test, "\n"
+	print "train: ", X[train].shape, Y[train].shape
+	print "test: ",X[test].shape, Y[test].shape, "\n\n\n"
+	
+
+
+
