@@ -54,7 +54,7 @@ class Dataset:
 
 		return np.divide(numerator,denominator)
 
-	def generate_polynomial_attributes(self, X):
+	def generate_polynomial_attributes(self, X, degree):
 		# TO DO
 		pass
 
