@@ -35,22 +35,20 @@ class Dataset:
 		# print "desvio padrão de cada atributo: ", Std
 
 		ds = {
-		'max':Max,
-		'min':Min,
-		'mean':Mean,
-		'std':Std
+			'max':Max,
+			'min':Min,
+			'mean':Mean,
+			'std':Std
 		}
 
 		return ds
 
 	# normalização min-max
 	def dataset_scaling(self, X):
-		# print Max.shape, X.shape
-		numerator = np.subtract(X, Min)
-		denominator = np.subtract(Max, Min)
-
-		# print numerator.shape
-		# print denominator.shape
+		ds = self.dataset_statistics(X)
+		
+		numerator = np.subtract(X, ds['min'])
+		denominator = np.subtract(ds['max'], ds['min'])
 
 		return np.divide(numerator,denominator)
 
@@ -87,15 +85,19 @@ class ModelSelection:
 
 		return zip(train, test)
 
-X = np.random.randn(100,4)
-Y = np.random.randn(100)
+#X = np.random.randn(100,4)
+#Y = np.random.randn(100)
 
-cv = ModelSelection()
+#dt = Dataset()
+#print dt.dataset_statistics(X)
+#print dt.dataset_scaling(X)
 
-for train,test in cv.k_fold(X, k=5, shuffle=False):
-	print train, "\n\n", test, "\n"
-	print "train: ", X[train].shape, Y[train].shape
-	print "test: ",X[test].shape, Y[test].shape, "\n\n\n"
+#cv = ModelSelection()
+
+#for train,test in cv.k_fold(X, k=5, shuffle=False):
+#	print train, "\n\n", test, "\n"
+#	print "train: ", X[train].shape, Y[train].shape
+#	print "test: ",X[test].shape, Y[test].shape, "\n\n\n"
 	
 
 
