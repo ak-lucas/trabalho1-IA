@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import matplotlib.pyplot as plt
 import numpy as np
+import itertools
 
 class Plot:
 	def __init__(self):
@@ -53,8 +54,24 @@ class Dataset:
 		return np.divide(numerator,denominator)
 
 	def generate_polynomial_attributes(self, X, degree):
-		# TO DO
-		pass
+		X_ = X
+		#print X_
+		combinations = {}
+		for d in range(2,degree+1):
+			combinations[d] = []
+			for i in X:
+				# gera todas combinações, com repetição, de grau d, dos atributos de cada exemplo e guarda em um dicionário
+				combinations[d].append(np.prod(list(itertools.combinations_with_replacement(i, d)), axis=1))
+
+			# concatena novos atributos ao dataset
+			X_ = np.concatenate((X_, np.asarray(combinations[d])), axis=1)
+			#print np.asarray(combinations[d])
+
+		#print X_.shape
+		#print X_
+
+		# retorna o novo dataset com atributos polinomiais de grau 1 a d
+		return X_
 
 class ModelSelection:
 	def __init__(self):
@@ -85,10 +102,11 @@ class ModelSelection:
 
 		return zip(train, test)
 
-#X = np.random.randn(100,4)
-#Y = np.random.randn(100)
+X = np.array([[2,3],[4,5], [6,7], [8,9]])
+Y = np.random.randn(4)
 
-#dt = Dataset()
+dt = Dataset()
+dt.generate_polynomial_attributes(X,3)
 #print dt.dataset_statistics(X)
 #print dt.dataset_scaling(X)
 
