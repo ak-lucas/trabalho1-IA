@@ -26,7 +26,7 @@ class RegularizedLinearRegression():
 	def prints(self, epoch):
 		print "--epoca %s: " % epoch
 		print "loss: ", self.loss[epoch]
-		print "theta: ", self.theta_0.reshape(theta[0].shape[0]), self.theta_n.reshape(theta[1].shape[0])
+		print "theta: ", self.theta_0.reshape(self.theta_0.shape[0]), self.theta_n.reshape(self.theta_n.shape[0])
 
 	def gradient_descent(self, epochs, X, Y, learning_rate, Lambda, m, print_results):
 		for i in xrange(epochs):
@@ -60,6 +60,7 @@ class RegularizedLinearRegression():
 		self.loss.append(loss)
 
 	def fit(self, X, Y, epochs=3, learning_rate=0.01, Lambda=0.001, print_results=False):
+		self.loss = []
 		# dimensão dos dados
 		m = X.shape[0]
 		n = X.shape[1]

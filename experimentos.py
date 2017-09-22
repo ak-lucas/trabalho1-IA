@@ -10,6 +10,7 @@ class Plot:
 	# X contém o conjuntos de pontos do eixo x e Y contém o conjunto de pontos do eixo y
 	def plot_graphic(self, X, Y, xlabel='', ylabel='', color='blue', linewidth=2, title='', grid=False):
 		plt.plot(X, Y, color=color, linewidth=linewidth)
+		plt.ylim([0, 1.2])
 		plt.xlabel(xlabel)
 		plt.ylabel(ylabel)
 		plt.title(title)

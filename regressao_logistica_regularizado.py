@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
+import csv
 
 # Hyperparameters: 
 #	-Lambda: fator de regularização
@@ -11,6 +12,25 @@ class RegularizedLogisticRegression():
 		self.theta_n = []
 		self.theta_0 = 0.
 		self.loss = []
+
+	def load_dataset(self, filename, header=True):
+		X = []
+		Y = []
+		with open(filename, 'r') as f:
+			reader = csv.reader(f)
+
+			if header:
+				next(reader)
+
+			for r in reader:
+				x = r[:-1]
+				X.append([float(a) for a in x])
+				Y.append(int(r[-1]))
+
+		X = np.array(X)
+		Y = np.array(Y)
+
+		return X, Y
 
 	def sigmoid(self, x):
 		return (1/(1+np.exp(-x)))
@@ -28,7 +48,7 @@ class RegularizedLogisticRegression():
 	def prints(self, epoch):
 		print "--epoca %s: " % epoch
 		print "loss: ", self.loss[epoch]
-		print "theta: ", self.theta_0.reshape(theta[0].shape[0]), self.theta_n.reshape(theta[1].shape[0])
+		print "theta: ", self.theta_0.reshape(self.theta_0.shape[0]), self.theta_n.reshape(self.theta_n.shape[0])
 
 	def gradient_descent(self, epochs, X, Y, Lambda, learning_rate, m, print_results):
 		for i in xrange(epochs):
@@ -63,6 +83,7 @@ class RegularizedLogisticRegression():
 		self.loss.append(loss)
 
 	def fit(self, X, Y, epochs=3, learning_rate=0.01, Lambda=0.001, print_results=False):
+		self.loss = []
 		# dimensão dos dados
 		m = X.shape[0]
 		n = X.shape[1]
