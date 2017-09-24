@@ -10,6 +10,7 @@ class Dataset:
 	def __init__(self, filename, haveHeader=0):
 		self.X = []
 		self.Y = []
+		self.m = 0
 		self.attributeNames = []
 		self.statistics = {}
 		self.filename = filename[:filename.find('.csv')]
@@ -27,18 +28,12 @@ class Dataset:
 				X.append([float(a) for a in x])
 				Y.append(to_number(r[-1]))
 
-		X = np.array(X)
-		Y = np.array(Y)
-
-		indices = np.arange(X.shape[0])
-
-		np.random.shuffle(indices)
-
-		self.X = X[indices]
-		self.Y = Y[indices]
+		self.X = np.array(X)
+		self.Y = np.array(Y)
+		self.m = self.X.shape[0]
 
 		if len(self.attributeNames) == 0:
-			self.attributeNames = range(X.shape[1])
+			self.attributeNames = range(self.X.shape[1])
 
 	# retorna os valores máximos, mínimos, médios e o desvio padrão de cada coluna do treino
 	def dataset_statistics(self, plot=False):
@@ -59,20 +54,23 @@ class Dataset:
 		
 	# normalização min-max
 	def dataset_scaling(self):
-		ds = self.dataset_statistics()
+		self.dataset_statistics()
 		
-		numerator = np.subtract(self.X, ds['min'])
-		denominator = np.subtract(ds['max'], ds['min'])
+		numerator = np.subtract(self.X, self.statistics['min'])
+		denominator = np.subtract(self.statistics['max'], self.statistics['min'])
 
 		self.X = np.divide(numerator,denominator)
 
-	def plot_statistics(self):
+	def plot_statistics(self, printOut=True):
 
 		x = range(1, len(self.attributeNames) + 1)
 		fig, ax = plt.subplots()
-		ax.plot(x , self.statistics['mean'],'g*', label=u"Média")
-		ax.plot(x , self.statistics['max'],'r1', label=u"Máximo")
-		ax.plot(x , self.statistics['min'],'b1', label=u"Mínimo")
+		ax.plot(x , self.statistics['mean'],'_r', label=u"Média")
+		#ax.plot(x , self.statistics['max'],'r1', label=u"Máximo")
+		#ax.plot(x , self.statistics['min'],'b1', label=u"Mínimo")
+		ax.errorbar(x, self.statistics['mean'], [self.statistics['mean'] - self.statistics['min'], self.statistics['max'] - self.statistics['mean']],
+             fmt='_r', ecolor='gray', lw=1)
+
 		ax.set_xticks([i for i in x])
 		ax.set_xticklabels(self.attributeNames)
 
@@ -81,12 +79,18 @@ class Dataset:
                  box.width, box.height * 0.9])
 
 		# Put a legend below current axis
-		ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
+		ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15),
         	  fancybox=True, shadow=True, ncol=5)
 		
 		plt.title(u"Dataset: Estatísticas")
+		plt.xlabel(u"Atributos")
+		plt.ylabel(u"Valores")
+		
 		fig.savefig("%s.png" % (self.filename)) 
 		plt.close(fig)
+
+		if printOut == True:
+			print self.statistics
 		
 
 def to_number(c):
@@ -123,5 +127,3 @@ if __name__ == '__main__':
 
 	except Exception as e:
 		error()
-
-
