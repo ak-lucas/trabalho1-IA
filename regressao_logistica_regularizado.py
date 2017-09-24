@@ -12,6 +12,8 @@ class RegularizedLogisticRegression():
 		self.theta_n = []
 		self.theta_0 = 0.
 		self.loss = []
+		self.train_error = []        
+		self.val_error = []
 
 	def load_dataset(self, filename, header=True):
 		X = []
@@ -50,7 +52,9 @@ class RegularizedLogisticRegression():
 		print "loss: ", self.loss[epoch]
 		print "theta: ", self.theta_0.reshape(self.theta_0.shape[0]), self.theta_n.reshape(self.theta_n.shape[0])
 
-	def gradient_descent(self, epochs, X, Y, Lambda, learning_rate, m, print_results):
+	def gradient_descent(self, epochs, X, Y, X_val, Y_val, Lambda, learning_rate, m, print_results):
+		self.train_error = []        
+		self.val_error = []
 		for i in xrange(epochs):
 			# calcula Z
 			Z = np.dot(self.theta_n.T, X) + self.theta_0
@@ -74,15 +78,21 @@ class RegularizedLogisticRegression():
 			if print_results:
 				self.prints(i)
 
+			self.train_error.append(self.binary_error(X.T,Y))
+			self.val_error.append(self.binary_error(X_val,Y_val))
+            
 		# calcula função de custo final
 		Z = np.dot(self.theta_n.T, X) + self.theta_0
 		# função de ativação
 		sigmoid_z = self.sigmoid(Z)
 		loss = self.loss_function(Y, sigmoid_z, Lambda, m)
+        
+		self.train_error.append(self.binary_error(X.T,Y))
+		self.val_error.append(self.binary_error(X_val,Y_val))
 
 		self.loss.append(loss)
 
-	def fit(self, X, Y, epochs=3, learning_rate=0.01, Lambda=0.001, print_results=False):
+	def fit(self, X, Y, X_val=[], Y_val=[], epochs=3, learning_rate=0.01, Lambda=0.001, print_results=False):
 		self.loss = []
 		# dimensão dos dados
 		m = X.shape[0]
@@ -95,7 +105,7 @@ class RegularizedLogisticRegression():
 		X = X.T
 		Y = Y.reshape(1,m)
 
-		self.gradient_descent(epochs, X, Y, Lambda, learning_rate, m, print_results)
+		self.gradient_descent(epochs, X, Y, X_val, Y_val, Lambda, learning_rate, m, print_results)
 
 		return self
 
