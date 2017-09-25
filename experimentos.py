@@ -86,20 +86,17 @@ class ModelSelection:
 			np.random.shuffle(indices)
 
 		# divide array de índices em k conjuntos de tamanhos iguais
-		indices_ = np.asarray(np.split(indices, k))
-		
+		indices_ = np.asarray(np.array_split(indices, k))
 
 		test = []
 		train = []
-		
+
 		nbgroups = range(len(indices_))
+
 		# cria duas listas com os índices dos conjuntos de treino e teste
 		for i in nbgroups:
 			test.append(indices_[i])
-			train.append(indices_[np.delete(nbgroups, i)].flatten())
-
-		#print "train", train[0].shape
-		#print "teste", test[0].shape
+			train.append(np.concatenate(np.asarray(indices_[np.delete(nbgroups, i)])))
 
 		return zip(train, test)
 
