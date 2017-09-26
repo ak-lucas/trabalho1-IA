@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import csv
-
+from scipy.special import expit
 # Hyperparameters: 
 #	-Lambda: fator de regularização
 #	-learning_rate: taxa de aprendizado
@@ -35,7 +35,8 @@ class RegularizedLogisticRegression():
 		return X, Y
 
 	def sigmoid(self, x):
-		return (1/(1+np.exp(-x)))
+		#return (1/(1+np.exp(-x)))
+		return expit(x)
 
 	# inicializa os pesos aleatoriamente com amostras da distribuição normal
 	def init_weights(self, dim):
@@ -43,6 +44,10 @@ class RegularizedLogisticRegression():
 
 	# função de custo: cross-entropy
 	def loss_function(self, Y, sigmoid_z, Lambda, m):
+		# resolve o problema do log(0)        
+		eps = 1e-15
+		sigmoid_z = np.clip(sigmoid_z, eps, 1 - eps)
+        
 		loss = -np.sum(np.multiply(Y,np.log(sigmoid_z)) + np.multiply(1-Y,np.log(1-sigmoid_z)))/m + np.multiply(np.sum(np.power(self.theta_n,2)), Lambda)/(2*m)
 
 		return loss
