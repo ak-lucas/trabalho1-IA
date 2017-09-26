@@ -11,7 +11,7 @@ from experimentos import ModelSelection
 
 # PARAMETROS
 epocas = int(sys.argv[1])
-alphas = [int(a) for a in (sys.argv[2]).split(',')]
+alphas = [float(a) for a in (sys.argv[2]).split(',')]
 
 # INICIALIZAÇÃO
 RL = RegularizedLinearRegression()
@@ -28,7 +28,6 @@ dataset.dataset_scaling()
 # 
 for train,val in MS.k_fold(dataset.X, k=5, shuffle=True):
 	# inicialização para cada fold
-	fig, ax = plt.subplots()
 	loss[str(fold)] = []
 
 	for a in alphas:
@@ -44,26 +43,25 @@ for train,val in MS.k_fold(dataset.X, k=5, shuffle=True):
 loss_ = []
 for k in ['1', '2', '3', '4','5']:
 	loss_.append(loss[k])
-   
+  
 mean = np.asarray(loss_).mean(axis=0)
 stdeviation = np.asarray(loss_).std(axis=0)
 
 fig, ax = plt.subplots()
+x = range(epocas+1)
 
-#     stdeviation = np.asarray(loss_).std(axis=0)[i]
-#     ax.plot(range(epochs[0]+1), mean, color=colors[i], linewidth=1)
-#     ax.fill_between(range(epochs[0]+1), mean-stdeviation, mean+stdeviation , color=colors[i], linewidth=1, alpha=0.2)
-    
-# plt.ylim([0.1, 1])
-# plt.xlabel(u'Épocas')
-# plt.ylabel(u'Custo')
+for i in xrange(len(alphas)):
+	ax.plot(x, mean[i], color=colors[i], label=u"$alpha =$ %.3f" % alphas[i])
+	ax.fill_between(x, mean[i]-stdeviation[i], mean[i]+stdeviation[i], color=colors[i], alpha=0.2)
 
-# box = ax.get_position()
-# ax.set_position([box.x0, box.y0 + box.height * 0.1,
-# box.width, box.height * 0.9])
-# lgd = ax.legend(handles=legends[:], loc='upper center', bbox_to_anchor=(0.5, -0.15), fancybox=True, shadow=True, ncol=5)
-# plt.title(title)
-# plt.grid(True)
+plt.xlabel(u'Épocas')
+plt.ylabel(u'Custo')
 
-# fig.savefig('media_std.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
-# plt.show()
+box = ax.get_position()
+ax.set_position([box.x0, box.y0 + box.height * 0.1,
+box.width, box.height * 0.9])
+lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), fancybox=True, shadow=True, ncol=5)
+plt.grid(True)
+
+fig.savefig('media_std.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+plt.close(fig)
