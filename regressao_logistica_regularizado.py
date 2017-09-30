@@ -104,8 +104,8 @@ class RegularizedLogisticRegression():
 		n = X.shape[1]
 
 		# inicializa os pesos aleatoriamente
-		self.theta_n = self.init_weights(n)
-		self.theta_0 = self.init_weights(1)
+		self.theta_n = self.init_weights(n)*0.01
+		self.theta_0 = self.init_weights(1)*0.01
 		
 		X = X.T
 		Y = Y.reshape(1,m)
