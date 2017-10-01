@@ -10,6 +10,7 @@ class Dataset:
 	def __init__(self, filename, haveHeader=0):
 		self.X = []
 		self.Y = []
+		self.X_polinomial = []
 		self.m = 0
 		self.attributeNames = []
 		self.statistics = {}
@@ -91,7 +92,36 @@ class Dataset:
 
 		if printOut == True:
 			print self.statistics
+
+	def init_polynomial(self, datascaling=True):
+		self.X_polinomial = self.X
+
+		if datascaling == True:
+			Max = self.X_polinomial.max(axis=0)
+			Min = self.X_polinomial.min(axis=0)
+
+			numerator = np.subtract(self.X_polinomial, Min)
+			denominator = np.subtract(Max, Min)
+
+			self.X_polinomial = np.divide(numerator, denominator)
+
+	def generate_polynomial_attributes(self, degree, datascaling=True):
+		combinations = []
 		
+		if degree != 1:
+			for i in self.X:
+				combinations.append(np.prod(list(itertools.combinations_with_replacement(i, degree)), axis=1))
+			combinations = np.array(combinations)
+			if datascaling == True:
+				Max = combinations.max(axis=0)
+				Min = combinations.min(axis=0)
+
+				numerator = np.subtract(combinations, Min)
+				denominator = np.subtract(Max, Min)
+
+				combinations = np.divide(numerator, denominator)
+			# concatena novos atributos ao dataset
+			self.X_polinomial = np.concatenate((self.X_polinomial, np.asarray(combinations)), axis=1)
 
 def to_number(c):
 	if c.count('.') == 0:

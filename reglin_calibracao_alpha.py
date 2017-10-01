@@ -12,13 +12,14 @@ from experimentos import ModelSelection
 # PARAMETROS
 epocas = int(sys.argv[1])
 alphas = [float(a) for a in (sys.argv[2]).split(',')]
+imagename = sys.argv[3]
 
 # INICIALIZAÇÃO
 RL = RegularizedLinearRegression()
 MS = ModelSelection()
-colors = ['red', 'blue', 'black', 'pink', 'gray', 'yellow', 'green', 'orange']
+colors = ['red', 'blue', 'black', 'magenta', 'gray', 'yellow', 'green',  'cyan', 'orange', 'pink']
 LAMBDA = 0
-fold = 1
+fold = 1	
 loss = {}
 
 # CARREGA DATASET
@@ -50,10 +51,11 @@ stdeviation = np.asarray(loss_).std(axis=0)
 fig, ax = plt.subplots()
 x = range(epocas+1)
 
+print "Erro médio na última época:"
 for i in xrange(len(alphas)):
 	ax.plot(x, mean[i], color=colors[i], label=u"$alpha =$ %.3f" % alphas[i], linewidth=1)
 	ax.fill_between(x, mean[i]-stdeviation[i], mean[i]+stdeviation[i], color=colors[i], alpha=0.2)
-	print mean[i][-1]
+	print "\t alpha %.3f: %f" % (alphas[i], mean[i][-1]) 
 plt.xlabel(u'Épocas')
 plt.ylabel(u'Custo')
 
@@ -64,6 +66,6 @@ lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), fancybox=True, 
 plt.ylim([0.0, 125000])
 plt.grid(True)
 
-fig.savefig('imagens/calibracao_inicial_alpha.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+fig.savefig('imagens/ccpp_%s.png' % imagename, bbox_extra_artists=(lgd,), bbox_inches='tight')
 plt.close(fig)
 
