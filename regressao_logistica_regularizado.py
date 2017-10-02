@@ -110,7 +110,7 @@ class RegularizedLogisticRegression():
 		X = X.T
 		Y = Y.reshape(1,m)
 
-		self.gradient_descent(epochs, X, Y, X_val, Y_val, Lambda, learning_rate, m, print_results)
+		self.gradient_descent(epochs, X, Y, X_val, Y_val, float(Lambda), float(learning_rate), float(m), print_results)
 
 		return self
 
