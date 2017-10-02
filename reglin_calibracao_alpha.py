@@ -51,11 +51,11 @@ stdeviation = np.asarray(loss_).std(axis=0)
 fig, ax = plt.subplots()
 x = range(epocas+1)
 
-print "Erro médio na última época:"
+print "Erro médio na última época - Diferença entre a última e a penúltima época:"
 for i in xrange(len(alphas)):
 	ax.plot(x, mean[i], color=colors[i], label=u"$alpha =$ %.3f" % alphas[i], linewidth=1)
 	ax.fill_between(x, mean[i]-stdeviation[i], mean[i]+stdeviation[i], color=colors[i], alpha=0.2)
-	print "\t alpha %.3f: %f" % (alphas[i], mean[i][-1]) 
+	print "\t alpha %.3f: %f \t %f" % (alphas[i], mean[i][-1], mean[i][-1] - mean[i][-2]) 
 plt.xlabel(u'Épocas')
 plt.ylabel(u'Custo')
 
@@ -66,6 +66,6 @@ lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), fancybox=True, 
 plt.ylim([0.0, 125000])
 plt.grid(True)
 
-fig.savefig('imagens/ccpp_%s.png' % imagename, bbox_extra_artists=(lgd,), bbox_inches='tight')
+fig.savefig('imagens/calibracao_alpha/ccpp_%s.png' % imagename, bbox_extra_artists=(lgd,), bbox_inches='tight')
 plt.close(fig)
 
