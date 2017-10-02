@@ -59,9 +59,9 @@ fig, ax = plt.subplots()
 x = range(1, graus + 1)
 
 ax.plot(x, meanTreino, color='red', label=u"$Erro_{treino}$", linewidth=1, marker='*')
-ax.fill_between(x, meanTreino-stdeviationTreino, meanTreino+stdeviationTreino, color='blue', alpha=0.2)
+ax.fill_between(x, meanTreino-stdeviationTreino, meanTreino+stdeviationTreino, color='red', alpha=0.2)
 ax.plot(x, meanValidacao, color='blue', label=u"$Erro_{validação}$", linewidth=1, marker='*')
-ax.fill_between(x, meanValidacao-stdeviationValidacao, meanValidacao+stdeviationValidacao, color='red', alpha=0.2)
+ax.fill_between(x, meanValidacao-stdeviationValidacao, meanValidacao+stdeviationValidacao, color='blue', alpha=0.2)
 
 #plt.ylim([0.0, 350])
 plt.xlabel(u'$\eta$')

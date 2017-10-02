@@ -2,81 +2,63 @@
 
 import csv
 import numpy as np
+import sys
 from dataset import Dataset
 import matplotlib.pyplot as plt
 from regressao_linear_regularizado import RegularizedLinearRegression
+from experimentos import ModelSelection
 
 # CARREGA DATASET
-dataset = Dataset("datasets/combined_cycle_power_plant_dataset.csv", 1)
-TRAIN_SIZE = int(.8 * dataset.m)
-epocas = 10
+datasetPuro = Dataset("datasets/combined_cycle_power_plant_dataset.csv", 1)
+lr1 = float(sys.argv[1])
 
-originalX = dataset.X
-originalY = dataset.Y
+datasetNormalizado = Dataset("datasets/combined_cycle_power_plant_dataset.csv", 1)
+datasetNormalizado.dataset_scaling()
+lr2 = float(sys.argv[2])
+
+RL = RegularizedLinearRegression()
+MS = ModelSelection()
+
+epocas = 3
 
 loss = []
-error = []
 lossNormalizado = []
-errorNormalizado = []
+fold = 0
+LAMBDA = 0
 
-for i in xrange(10):
-	dataset.X = originalX
-	dataset.Y = originalY
+for train,val in MS.k_fold(datasetPuro.X, k=5, shuffle=True):
+	# inicialização para cada fold
 
-	indices = np.arange(dataset.m)
-	np.random.shuffle(indices)
+	RL.fit(datasetPuro.X[train], datasetPuro.Y[train], epochs=epocas, learning_rate=lr1, Lambda=LAMBDA)
+	loss.append(RL.loss)
 
-	X = dataset.X[indices]
-	Y = dataset.Y[indices]
-	
-	X_train = dataset.X[:TRAIN_SIZE]
-	Y_train = dataset.Y[:TRAIN_SIZE]
+	RL.fit(datasetNormalizado.X[train], datasetNormalizado.Y[train], epochs=epocas, learning_rate=lr2, Lambda=LAMBDA)
+	lossNormalizado.append(RL.loss)
 
-	X_test = dataset.X[TRAIN_SIZE:]
-	Y_test = dataset.Y[TRAIN_SIZE:]
+	fold += 1
 
-	lr = RegularizedLinearRegression()
-	lr.fit(X_train, Y_train, epochs=epocas, learning_rate=0.000001, Lambda=0.00)
-	loss.append(lr.loss)
-
-	dataset.dataset_scaling()
-
-	X_train = dataset.X[:TRAIN_SIZE]
-	Y_train = dataset.Y[:TRAIN_SIZE]
-
-	X_test = dataset.X[TRAIN_SIZE:]
-	Y_test = dataset.Y[TRAIN_SIZE:]
-
-	lrScaling = RegularizedLinearRegression()
-	lrScaling.fit(X_train, Y_train, epochs=epocas, learning_rate=0.5, Lambda=0.00)
-	lossNormalizado.append(lrScaling.loss)
-
-loss = np.array(loss)
-lossNormalizado = np.array(lossNormalizado)
-
-mediaLoss = loss.mean(axis=0)/10000
-mediaLossNormalizado = lossNormalizado.mean(axis=0)/10000
+meanPuro = np.asarray(loss).mean(axis=0)/10000
+stdeviationPuro = np.asarray(loss).std(axis=0)/10000
+meanNormalizado = np.asarray(lossNormalizado).mean(axis=0)/10000
+stdeviationNormalizado = np.asarray(lossNormalizado).std(axis=0)/10000
 
 x = range(0, epocas + 1)
 fig, ax = plt.subplots()
 
-ax.plot(x , mediaLoss,'g-', label=u"Puro")
-ax.plot(x , mediaLossNormalizado,'r-', label=u"Normalizado")
+ax.plot(x, meanPuro, color='red', label=u"$Custo_{treino_{puro}}$", linewidth=1, marker='*')
+ax.fill_between(x, meanPuro-stdeviationPuro, meanPuro+stdeviationPuro, color='red', alpha=0.2)
+ax.plot(x, meanNormalizado, color='blue', label=u"$Custo_{treino_{normalizado}}$", linewidth=1, marker='*')
+ax.fill_between(x, meanNormalizado-stdeviationNormalizado, meanNormalizado+stdeviationNormalizado, color='blue', alpha=0.2)
+
+#plt.ylim([0.0, 350])
+plt.xlabel(u'$Época$')
+plt.ylabel(u'Custo($x10^4 $)')
 
 box = ax.get_position()
 ax.set_position([box.x0, box.y0 + box.height * 0.1,
-         box.width, box.height * 0.9])
-
-# Put a legend below current axis
-ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15),
-	  fancybox=True, shadow=True, ncol=5)
-
-ax.get_xaxis().get_major_formatter().set_scientific(True)
-
-plt.title(u"Comparação: Erro no Treino dos dados puros e normalizados")
-plt.xlabel(u"Iterações")
-plt.ylabel(u"Função Custo($x10^4$)")
+ box.width, box.height * 0.9])
+lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), fancybox=True, shadow=True, ncol=5)
 plt.grid(True)
 
-fig.savefig("comparacao.png") 
+fig.savefig('imagens/ccpp_comparacao.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
 plt.close(fig)
