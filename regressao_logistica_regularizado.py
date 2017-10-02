@@ -78,7 +78,7 @@ class RegularizedLogisticRegression():
 
 			# atualiza pesos
 			self.theta_0 -= learning_rate*gTheta_0
-			self.theta_n = self.theta_n*(1-(learning_rate*Lambda/m)) - learning_rate*gTheta_n
+			self.theta_n = self.theta_n*(1.-(float(learning_rate*Lambda)/m)) - learning_rate*gTheta_n
 
 			if print_results:
 				self.prints(i)
