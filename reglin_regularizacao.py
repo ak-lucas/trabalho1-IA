@@ -15,6 +15,7 @@ alpha = float(sys.argv[2])
 degree = int(sys.argv[3])
 lambdas = [float(a) for a in (sys.argv[4]).split(',')]
 imagename = sys.argv[5]
+linhaHorizontal = int(sys.argv[6])
 
 # INICIALIZAÇÃO
 RL = RegularizedLinearRegression()
@@ -23,10 +24,10 @@ colors = ['red', 'blue', 'black', 'magenta', 'gray', 'yellow', 'green',  'cyan',
 fold = 0	
 erroTreino = []
 erroValidacao = []
+loss = []
 
 # CARREGA DATASET
 dataset = Dataset("datasets/combined_cycle_power_plant_dataset.csv", 1)
-dataset.dataset_scaling()
 dataset.init_polynomial()
 for d in xrange(1,degree + 1):
 	dataset.generate_polynomial_attributes(d)
@@ -36,10 +37,12 @@ for train,val in MS.k_fold(dataset.X_polinomial, k=5, shuffle=True):
 	# inicialização para cada fold
 	erroTreino.append([])
 	erroValidacao.append([])
+	loss.append([])
 
 	for l in lambdas:
 		# ajusta o modelo
 		RL.fit(dataset.X_polinomial[train], dataset.Y[train], epochs=epocas, learning_rate=alpha, Lambda=l)
+		loss[fold].append(RL.loss[-1])
 
 		# calcula e guarda o erro no treino
 		Y_pred = RL.predict(dataset.X_polinomial[train])
@@ -57,14 +60,21 @@ meanTreino = np.asarray(erroTreino).mean(axis=0)
 stdeviationTreino = np.asarray(erroTreino).std(axis=0)
 meanValidacao = np.asarray(erroValidacao).mean(axis=0)
 stdeviationValidacao = np.asarray(erroValidacao).std(axis=0)
+meanLoss = np.asarray(loss).mean(axis=0)
+
+print "Função de custo:"
+for l in meanLoss:
+	print "\t %.6f" % l
 
 fig, ax = plt.subplots()
-x = range(len(lambdas))
 
-ax.plot(x, meanTreino, color='red', label=u"$Erro_{treino}$", linewidth=1, marker='*')
-ax.fill_between(x, meanTreino-stdeviationTreino, meanTreino+stdeviationTreino, color='red', alpha=0.2)
-ax.plot(x, meanValidacao, color='blue', label=u"$Erro_{validação}$", linewidth=1, marker='*')
-ax.fill_between(x, meanValidacao-stdeviationValidacao, meanValidacao+stdeviationValidacao, color='blue', alpha=0.2)
+ax.plot(lambdas, meanTreino, color='red', label=u"$Erro_{treino}$", linewidth=1, marker='*')
+ax.fill_between(lambdas, meanTreino-stdeviationTreino, meanTreino+stdeviationTreino, color='red', alpha=0.2)
+ax.plot(lambdas, meanValidacao, color='blue', label=u"$Erro_{validação}$", linewidth=1, marker='*')
+ax.fill_between(lambdas, meanValidacao-stdeviationValidacao, meanValidacao+stdeviationValidacao, color='blue', alpha=0.2)
+
+if linhaHorizontal == 1:
+	ax.axhline(y=meanValidacao[np.argmin(meanValidacao, axis=0)], color='black', linestyle='dashed')
 
 #plt.ylim([0.0, 350])
 plt.xlabel(u'$\lambda$')
